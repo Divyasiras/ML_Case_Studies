@@ -5,44 +5,68 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
 def main():
-    #step 1 : load the data
+    # Step 1 : Load the data
     df = pd.read_csv("Mall_Customers.csv")
 
-    print("Dataset loaded with values:")
+    print("Dataset loaded with values")
     print(df.head())
 
-    print("Missing values :")
-    print(df.isnull().sum())
+    print("Missing values : ")
+    print(df.isnull().sum())  
 
-    #step 2: Feature selection
-    X = df[["AnnualIncome","SpendingScore"]]
+    # Step 2 : Feature selection
+    X = df[["AnnualIncome", "SpendingScore"]]
 
-    print("Selected feature")
+    print("Selected fetures : ")
     print(X.head())
 
-    #step 3: scale the data
-    scaler = StandardScaler()
+    # Step 3 : Scale the data
+    scalar = StandardScaler()
 
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scalar.fit_transform(X)
 
-    print("Scaled data")
+    print("Scaled data : ")
     print(X_scaled[:5])
 
-    #step 4: Elbow method 
+    # Step 4 : Elbow method
     WCSS = []
 
     for k in range(1,11):
         model = KMeans(
-            n_clusters= k,
-            random_state= 42,
-            n_init= 10
+            n_clusters = k,
+            random_state=42,
+            n_init=10
         )
+
         model.fit(X_scaled)
+
         WCSS.append(model.inertia_)
 
-    print("Values of WCSS  :")
+    print("Values of WCSS : ")
     for i in range(len(WCSS)):
-        print(f"{i+1}:{WCSS[i]}")
+        print(f"{i+1} : {WCSS[i]}")
+
+    # Step 5 : Visualisation
+    plt.plot(range(1,11),WCSS, marker = "o")
+    plt.xlabel("Number of clusters : k")
+    plt.ylabel("WCSS")
+    plt.title("Marvellous Elbow method")
+    plt.grid(True)
+    plt.show()
+
+    # Step 6 : Final model
+    model = KMeans(
+                n_clusters = 4,
+                random_state=42,
+                n_init=10
+            )
+
+    clusters = model.fit_predict(X_scaled)
+
+    df["Cluster"] = clusters
+
+    print("Dataset with clusters : ")
+    print(df.head(100))
 
 if __name__ == "__main__":
     main()
